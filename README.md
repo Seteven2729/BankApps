@@ -28,7 +28,8 @@ docker compose up --build
 ```
 
 Wait until all containers are fully up and running.
-
+## ERD
+![Alt text](./erd.png)
 ## Testing APIs with Postman
 
 1. Open Postman.
