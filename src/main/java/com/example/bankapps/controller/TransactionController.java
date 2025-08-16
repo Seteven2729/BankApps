@@ -5,6 +5,7 @@ import com.example.bankapps.exception.UnauthorizedException;
 import com.example.bankapps.model.dao.Account;
 import com.example.bankapps.model.dto.TransactionRequest;
 import com.example.bankapps.service.TransactionService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping("/withdraw")
-    public ResponseEntity<Map<String, Serializable>> withdrawMoney(@RequestBody TransactionRequest request, Authentication authentication) {
+    public ResponseEntity<Map<String, Serializable>> withdrawMoney(@RequestBody @Valid TransactionRequest request, Authentication authentication) {
         Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();
         String tokenEmail = jwt.getClaimAsString("preferred_username");
         if (!request.getEmail().equalsIgnoreCase(tokenEmail)) {
@@ -39,8 +40,17 @@ public class TransactionController {
     }
 
     @PostMapping("/deposit")
-    public String depositMoney() {
-        return "deposit";
+    public  ResponseEntity<Map<String, Serializable>> depositMoney(@RequestBody @Valid TransactionRequest request, Authentication authentication) {
+        Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();
+        String tokenEmail = jwt.getClaimAsString("preferred_username");
+        if (!request.getEmail().equalsIgnoreCase(tokenEmail)) {
+            throw new UnauthorizedException("Email in request does not match token");
+        }
+        Account account = transactionService.depositMoney(request);
+
+        return ResponseEntity.ok(Map.of(
+                "email",account.getEmail(),
+                "balance", Utility.toIDR(account.getBalance())));
     }
 
     @GetMapping("/statement")

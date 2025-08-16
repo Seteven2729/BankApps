@@ -30,7 +30,7 @@ public class TransactionServiceImpl implements TransactionService {
         Account account = accountRepository.findByEmailForUpdate(request.getEmail()).orElseThrow(() -> new AccountNotFoundException(request.getEmail()));
 
         // (idempotency)
-        if (transactionRepository.findByRequestId(request.getReqId()).isPresent()) {
+        if (transactionRepository.findByRequestIdAndType(request.getReqId(),"WITHDRAW").isPresent()) {
             return account;
         }
         if (account.getBalance().compareTo(request.getAmount()) < 0) {
@@ -52,8 +52,25 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public String depositMoney(TransactionRequest request) {
-        return "";
+    public Account depositMoney(TransactionRequest request) {
+        Account account = accountRepository.findByEmailForUpdate(request.getEmail()).orElseThrow(() -> new AccountNotFoundException(request.getEmail()));
+
+        // (idempotency)
+        if (transactionRepository.findByRequestIdAndType(request.getReqId(),"DEPOSIT").isPresent()) {
+            return account;
+        }
+        account.setBalance(account.getBalance().add(request.getAmount()));
+        Transaction txn = Transaction.builder()
+                .account(account)
+                .type("DEPOSIT")
+                .amount(request.getAmount())
+                .balanceAfter(account.getBalance())
+                .requestId(request.getReqId())
+                .build();
+
+        transactionRepository.save(txn);
+
+        return accountRepository.save(account);
     }
 
     @Override

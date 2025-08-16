@@ -5,7 +5,7 @@ import com.example.bankapps.model.dto.TransactionRequest;
 
 public interface TransactionService {
     Account withdrawMoney(TransactionRequest request);
-    String depositMoney(TransactionRequest request);
+    Account depositMoney(TransactionRequest request);
     String getStatement();
     String getBalance(String email);
 }
