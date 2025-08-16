@@ -9,6 +9,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AccountRequest {
 
     @NotBlank(message = "Email must be not blank/empty")
