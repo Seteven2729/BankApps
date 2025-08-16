@@ -5,6 +5,8 @@ import com.example.bankapps.exception.AccountNotFoundException;
 import com.example.bankapps.exception.InsufficientBalanceException;
 import com.example.bankapps.model.dao.Account;
 import com.example.bankapps.model.dao.Transaction;
+import com.example.bankapps.model.dto.StatementDto;
+import com.example.bankapps.model.dto.TransactionDto;
 import com.example.bankapps.model.dto.TransactionRequest;
 import com.example.bankapps.repository.AccountRepository;
 import com.example.bankapps.repository.TransactionRepository;
@@ -14,8 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +32,11 @@ public class TransactionServiceImpl implements TransactionService {
         Account account = accountRepository.findByEmailForUpdate(request.getEmail()).orElseThrow(() -> new AccountNotFoundException(request.getEmail()));
 
         // (idempotency)
-        if (transactionRepository.findByRequestIdAndType(request.getReqId(),"WITHDRAW").isPresent()) {
+        if (transactionRepository.findByRequestIdAndType(request.getReqId(), "WITHDRAW").isPresent()) {
             return account;
         }
         if (account.getBalance().compareTo(request.getAmount()) < 0) {
-            throw new InsufficientBalanceException(Utility.toIDR(account.getBalance()),Utility.toIDR(request.getAmount()));
+            throw new InsufficientBalanceException(Utility.toIDR(account.getBalance()), Utility.toIDR(request.getAmount()));
         }
         account.setBalance(account.getBalance().subtract(request.getAmount()));
 
@@ -56,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
         Account account = accountRepository.findByEmailForUpdate(request.getEmail()).orElseThrow(() -> new AccountNotFoundException(request.getEmail()));
 
         // (idempotency)
-        if (transactionRepository.findByRequestIdAndType(request.getReqId(),"DEPOSIT").isPresent()) {
+        if (transactionRepository.findByRequestIdAndType(request.getReqId(), "DEPOSIT").isPresent()) {
             return account;
         }
         account.setBalance(account.getBalance().add(request.getAmount()));
@@ -74,8 +76,23 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public String getStatement() {
-        return "";
+    public StatementDto getStatement(String email) {
+        Account account = accountRepository.findByEmail(email).orElseThrow(() -> new AccountNotFoundException(email));
+        List<Transaction> transactionList = transactionRepository.findByAccountIdOrderByCreatedAtDesc(account.getId());
+        List<TransactionDto> transactionDtos = transactionList.stream()
+                .map(transaction -> TransactionDto.builder()
+                        .id(transaction.getId())
+                        .type(transaction.getType())
+                        .amount(Utility.toIDR(transaction.getAmount()))
+                        .balanceAfter(Utility.toIDR(transaction.getBalanceAfter()))
+                        .createdAt(transaction.getCreatedAt())
+                        .build()).sorted(Comparator.comparing(TransactionDto::getCreatedAt)).toList();
+
+        return StatementDto.builder()
+                .email(account.getEmail())
+                .balance(Utility.toIDR(account.getBalance()))
+                .transactions(transactionDtos)
+                .build();
     }
 
     @Override
