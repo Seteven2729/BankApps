@@ -23,6 +23,15 @@ public interface KeycloakAdminGateway {
             @RequestBody MultiValueMap<String, String> formData
     );
 
+    @PostMapping(
+            value = "/realms/master/protocol/openid-connect/token",
+            consumes = "application/x-www-form-urlencoded"
+    )
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    JsonNode getToken(
+            @RequestBody MultiValueMap<String, String> formData
+    );
+
     @PostMapping(value = "/admin/realms/master/users", consumes = "application/json")
     void createUser(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String token, @RequestBody UserDto user);
 

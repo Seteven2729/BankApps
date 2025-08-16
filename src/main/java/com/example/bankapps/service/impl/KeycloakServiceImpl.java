@@ -1,7 +1,9 @@
 package com.example.bankapps.service.impl;
 
 import com.example.bankapps.gateway.KeycloakAdminGateway;
+import com.example.bankapps.model.dto.AccountRequest;
 import com.example.bankapps.model.dto.ClientRolesDto;
+import com.example.bankapps.model.dto.TokenDto;
 import com.example.bankapps.model.dto.UserDto;
 import com.example.bankapps.service.KeycloakService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,6 +28,21 @@ public class KeycloakServiceImpl implements KeycloakService {
         formData.add("client_secret", "0vwSkNgKRd75wuWW4pVETAohlwsyTkDF");
         JsonNode responseNode = keycloakAdminGateway.getAdminToken(formData);
         return responseNode.path("access_token").asText();
+    }
+
+    @Override
+    public TokenDto getToken(AccountRequest request) {
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("grant_type", "password");
+        form.add("client_id", "bank-apps-clientId");
+        form.add("client_secret", "peur0chDadRSuY9xr4UXXiHwQCTkYSRj");
+        form.add("username", request.getEmail());
+        form.add("password", request.getPassword());
+        JsonNode response = keycloakAdminGateway.getToken(form);
+        return TokenDto.builder()
+                .token(response.path("access_token").asText())
+                .expiresIn(response.path("expires_in").asLong())
+                .build();
     }
 
     @Override
