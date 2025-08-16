@@ -1,6 +1,7 @@
 package com.example.bankapps.integration;
 
 import com.example.bankapps.BankAppsApplication;
+import com.example.bankapps.TestSecurityConfig;
 import com.example.bankapps.TestcontainersConfiguration;
 import com.example.bankapps.gateway.KeycloakAdminGateway;
 import com.example.bankapps.model.dto.AccountRequest;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringBootTest(classes = {BankAppsApplication.class, TestcontainersConfiguration.class})
+@SpringBootTest(classes = {BankAppsApplication.class, TestcontainersConfiguration.class, TestSecurityConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class AccountControllerTest {

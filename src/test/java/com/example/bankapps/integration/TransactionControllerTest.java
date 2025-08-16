@@ -2,6 +2,7 @@ package com.example.bankapps.integration;
 
 
 import com.example.bankapps.BankAppsApplication;
+import com.example.bankapps.TestSecurityConfig;
 import com.example.bankapps.TestcontainersConfiguration;
 import com.example.bankapps.commons.Utility;
 import com.example.bankapps.model.dao.Account;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = {BankAppsApplication.class, TestcontainersConfiguration.class})
+@SpringBootTest(classes = {BankAppsApplication.class, TestcontainersConfiguration.class, TestSecurityConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class TransactionControllerTest {
