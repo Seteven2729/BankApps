@@ -1,0 +1,5 @@
+CREATE TABLE accounts (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    balance NUMERIC(15, 2) DEFAULT 0.00
+);
