@@ -2,7 +2,6 @@ package com.example.bankapps.model.dto;
 
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter

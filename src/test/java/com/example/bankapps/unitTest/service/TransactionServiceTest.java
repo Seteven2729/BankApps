@@ -90,8 +90,9 @@ class TransactionServiceTest {
 
         when(transactionRepository.findByRequestIdAndType(anyString(), anyString())).thenReturn(Optional.empty());
 
+        TransactionRequest request = new TransactionRequest("easd", "1", BigDecimal.valueOf(5001));
         InsufficientBalanceException ex = assertThrows(InsufficientBalanceException.class, () -> {
-            transactionService.withdrawMoney(new TransactionRequest("easd", "1", BigDecimal.valueOf(5001)));
+            transactionService.withdrawMoney(request);
         });
 
         assertNotNull(ex.getMessage());
