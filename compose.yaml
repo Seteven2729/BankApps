@@ -45,6 +45,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mybank
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: 12345
+      TZ: Asia/Jakarta
       KEYCLOAK_URL: http://keycloak:8080
     ports:
       - 8081:8081
