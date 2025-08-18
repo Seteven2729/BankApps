@@ -26,6 +26,7 @@ public class Account {
     @Column(name = "balance", nullable = false, columnDefinition = "numeric default 500000")
     private BigDecimal balance = BigDecimal.valueOf(500000);
 
+    @Builder.Default
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions = new ArrayList<>();
 }
